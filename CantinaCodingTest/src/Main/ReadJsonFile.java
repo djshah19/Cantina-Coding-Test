@@ -44,6 +44,10 @@ public class ReadJsonFile {
 	
 	public static Set<JSONObject> recurseJson(JSONObject jsonObject, String selector){
 		Set<JSONObject> set = new HashSet<>();
+		String[] array = null;
+		if(selector.contains("#")){
+			array = selector.split("#");
+		}
 		JSONArray arr = (JSONArray) jsonObject.get("subviews");
 		if(arr==null){
 			JSONObject jsonObject2 = (JSONObject) jsonObject.get("contentView");
@@ -59,7 +63,12 @@ public class ReadJsonFile {
 			JSONObject jsonObject1 = (JSONObject) arr.get(i);
 			JSONArray arr1 = (JSONArray) jsonObject1.get("classNames");
 			JSONObject jsonObject3 = (JSONObject) jsonObject1.get("control");
-			if(jsonObject1.get("class").equals(selector)){
+			
+			if(array!=null&&jsonObject3!=null&&jsonObject1.get("class").equals(array[0])&&jsonObject3.containsKey("identifier") 
+					&& jsonObject3.containsValue(array[1])){
+				set.add(jsonObject1);
+			}
+			else if(jsonObject1.get("class").equals(selector)){
 				set.add(jsonObject1);
 			}else if(arr1!=null&&arr1.contains(selector)){
 				set.add(jsonObject1);
