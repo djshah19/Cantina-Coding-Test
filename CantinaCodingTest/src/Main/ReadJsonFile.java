@@ -50,36 +50,36 @@ public class ReadJsonFile {
 	
 	public static Set<JSONObject> recurseJson(JSONObject jsonObject, String selector){
 		Set<JSONObject> set = new HashSet<>();
-		String[] array = null;
+		String[] compound = null;
 		if(selector.contains("#")){
-			array = selector.split("#");
+			compound = selector.split("#");
 		}
-		JSONArray arr = (JSONArray) jsonObject.get("subviews");
-		if(arr==null){
-			JSONObject jsonObject2 = (JSONObject) jsonObject.get("contentView");
-			if(jsonObject2==null){
+		JSONArray subviews = (JSONArray) jsonObject.get("subviews");
+		if(subviews==null){
+			JSONObject contentView = (JSONObject) jsonObject.get("contentView");
+			if(contentView==null){
 				return set;
 			}
-			arr = (JSONArray) jsonObject2.get("subviews");
-			if(arr==null){
+			subviews = (JSONArray) contentView.get("subviews");
+			if(subviews==null){
 				return set;
 			}
 		}
-		for(int i = 0;i<arr.size();i++){
-			JSONObject jsonObject1 = (JSONObject) arr.get(i);
-			JSONArray arr1 = (JSONArray) jsonObject1.get("classNames");
-			JSONObject jsonObject3 = (JSONObject) jsonObject1.get("control");
+		for(int i = 0;i<subviews.size();i++){
+			JSONObject jsonObject1 = (JSONObject) subviews.get(i);
+			JSONArray classNames = (JSONArray) jsonObject1.get("classNames");
+			JSONObject control = (JSONObject) jsonObject1.get("control");
 			
-			if((array!=null&&arr1!=null&&jsonObject1.get("class").equals(array[0])&&arr1.contains(array[1]))
-				|| (array!=null&&jsonObject3!=null&&jsonObject1.get("class").equals(array[0])&&jsonObject3.containsKey("identifier") 
-					&& jsonObject3.containsValue(array[1]))){
+			if((compound!=null&&classNames!=null&&jsonObject1.get("class").equals(compound[0])&&classNames.contains(compound[1]))
+				|| (compound!=null&&control!=null&&jsonObject1.get("class").equals(compound[0])&&control.containsKey("identifier") 
+					&& control.containsValue(compound[1]))){
 				set.add(jsonObject1);
 			}
 			else if(jsonObject1.get("class").equals(selector)){
 				set.add(jsonObject1);
-			}else if(arr1!=null&&arr1.contains(selector)){
+			}else if(classNames!=null&&classNames.contains(selector)){
 				set.add(jsonObject1);
-			}else if(jsonObject3!=null && jsonObject3.containsKey("identifier") && jsonObject3.containsValue(selector))
+			}else if(control!=null && control.containsKey("identifier") && control.containsValue(selector))
 			{
 				set.add(jsonObject1);
 			}
