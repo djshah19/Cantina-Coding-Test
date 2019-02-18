@@ -25,8 +25,14 @@ public class ReadJsonFile {
 		try{
 		Object obj = parser.parse(new FileReader(args[0].replace("_", " ")));
 		JSONObject jsonObject = (JSONObject)obj;
-		Set<JSONObject> set = recurseJson(jsonObject, selector);
-//		System.out.println(set.size());
+		Set<JSONObject> set = new HashSet<>();
+		if(selector.contains(" ")){
+			String[] array = selector.split(" ");
+			for(String sel : array){
+		     set.addAll(recurseJson(jsonObject, sel));		
+			}
+		}else{
+		set = recurseJson(jsonObject, selector);}
 		for(JSONObject val : set){
 			System.out.println(val.toJSONString());
 		}
@@ -64,8 +70,9 @@ public class ReadJsonFile {
 			JSONArray arr1 = (JSONArray) jsonObject1.get("classNames");
 			JSONObject jsonObject3 = (JSONObject) jsonObject1.get("control");
 			
-			if(array!=null&&jsonObject3!=null&&jsonObject1.get("class").equals(array[0])&&jsonObject3.containsKey("identifier") 
-					&& jsonObject3.containsValue(array[1])){
+			if((array!=null&&arr1!=null&&jsonObject1.get("class").equals(array[0])&&arr1.contains(array[1]))
+				|| (array!=null&&jsonObject3!=null&&jsonObject1.get("class").equals(array[0])&&jsonObject3.containsKey("identifier") 
+					&& jsonObject3.containsValue(array[1]))){
 				set.add(jsonObject1);
 			}
 			else if(jsonObject1.get("class").equals(selector)){
