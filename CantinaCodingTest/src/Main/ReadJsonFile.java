@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Scanner;
 import java.util.Set;
 
 import org.json.simple.JSONArray;
@@ -16,13 +17,16 @@ import org.json.simple.parser.ParseException;
 public class ReadJsonFile {
 
 	public static void main(String[] args) {
+		System.out.println("Enter the selector: ");
+		Scanner scanner = new Scanner(System.in);
+		String selector = scanner.nextLine();
 		JSONParser parser = new JSONParser();
 	
 		try{
-		Object obj = parser.parse(new FileReader("C:\\Users\\Dhwani Shah\\Desktop\\IS\\myJSON.json"));
+		Object obj = parser.parse(new FileReader(args[0].replace("_", " ")));
 		JSONObject jsonObject = (JSONObject)obj;
-		Set<JSONObject> set = recurseJson(jsonObject);
-		System.out.println(set.size());
+		Set<JSONObject> set = recurseJson(jsonObject, selector);
+//		System.out.println(set.size());
 		for(JSONObject val : set){
 			System.out.println(val.toJSONString());
 		}
@@ -38,7 +42,7 @@ public class ReadJsonFile {
 		}
 	}
 	
-	public static Set<JSONObject> recurseJson(JSONObject jsonObject){
+	public static Set<JSONObject> recurseJson(JSONObject jsonObject, String selector){
 		Set<JSONObject> set = new HashSet<>();
 		JSONArray arr = (JSONArray) jsonObject.get("subviews");
 		if(arr==null){
@@ -54,12 +58,16 @@ public class ReadJsonFile {
 		for(int i = 0;i<arr.size();i++){
 			JSONObject jsonObject1 = (JSONObject) arr.get(i);
 			JSONArray arr1 = (JSONArray) jsonObject1.get("classNames");
-			if(jsonObject1.get("class").equals("Input")){
+			JSONObject jsonObject3 = (JSONObject) jsonObject1.get("control");
+			if(jsonObject1.get("class").equals(selector)){
 				set.add(jsonObject1);
-			}else if(arr1!=null&&arr1.contains("container")){
+			}else if(arr1!=null&&arr1.contains(selector)){
+				set.add(jsonObject1);
+			}else if(jsonObject3!=null && jsonObject3.containsKey("identifier") && jsonObject3.containsValue(selector))
+			{
 				set.add(jsonObject1);
 			}
-			set.addAll(recurseJson(jsonObject1));
+			set.addAll(recurseJson(jsonObject1, selector));
 		}
 		return set;
 	}
